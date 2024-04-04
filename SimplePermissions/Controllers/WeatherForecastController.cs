@@ -64,25 +64,15 @@ public class WeatherForecastController : ControllerBase
 
     private async Task SeedAsync()
     {
-        try
-        {
-            // Create Tenant
-            await _client.TenantApi.CreateTenantAsync(new CreateTenantRequest("default", "Default"));
-
-            // Create cities
-            await _client.ResourceApi.CreateResourceAsync("default", "city", new CreateResourceRequest("cansas", new CreateResourceParent("default")));
-            await _client.ResourceApi.CreateResourceAsync("default", "city", new CreateResourceRequest("seattle", new CreateResourceParent("default")));
-        }
-        catch (SpaceBlocks.Permissions.Server.Client.ApiException ex)
-        {
-            if (ex.ErrorCode == 409)
-            {
-                // Tenant already exists
-                return;
-            }
-
-            throw;
-        }
+        // Create Tenant
+        await ExecuteWithConflictTolerationAsync(() =>
+            _client.TenantApi.CreateTenantAsync(new CreateTenantRequest("default", "Default")));
+        
+        // Create cities
+        await ExecuteWithConflictTolerationAsync(() => _client.ResourceApi.CreateResourceAsync("default", "city",
+            new CreateResourceRequest("cansas", new CreateResourceParent("default"))));
+        await ExecuteWithConflictTolerationAsync(() => _client.ResourceApi.CreateResourceAsync("default", "city",
+            new CreateResourceRequest("seattle", new CreateResourceParent("default"))));
 
         // Assign roles to cansas
         await _client.ResourceApi.PatchResourceMembersAsync(
@@ -103,5 +93,24 @@ public class WeatherForecastController : ControllerBase
                     { "alice", ["current-forecast-viewer"] },
                     { "linda", ["future-forecast-viewer"] }
             }));
+    }
+
+    private async Task ExecuteWithConflictTolerationAsync(Func<Task> callback)
+    {
+        try
+        {
+            // Execute the callback
+            await callback();
+        }
+        catch (SpaceBlocks.Permissions.Server.Client.ApiException ex)
+        {
+            if (ex.ErrorCode == 409)
+            {
+                // Already exists, ignore
+                return;
+            }
+
+            throw;
+        }
     }
 }
