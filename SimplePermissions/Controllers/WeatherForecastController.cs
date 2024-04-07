@@ -32,12 +32,12 @@ public class WeatherForecastController : ControllerBase
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
-    public async Task<IEnumerable<WeatherForecast>> Get([FromQuery] string city, [FromQuery] string user)
+    public async Task<ActionResult<IEnumerable<WeatherForecast>?>> Get([FromQuery] string city, [FromQuery] string user)
     {
-        // Check, which permissions the user has
+        // Check, which permissions the user has for the city
         var permissions = await _client.PermissionApi.ListPermissionsAsync(
             tenantId: "default",
-            resourceTypeId: "city", // "tenant" also doesn't work
+            resourceTypeId: "city",
             resourceId: city,
             subjectId: user);
 
@@ -46,20 +46,21 @@ public class WeatherForecastController : ControllerBase
         var canGetFutureForecast = permissions["city"].Contains("get-future-forecast");
         if (!canGetCurrentForecast && !canGetFutureForecast)
         {
-            throw new UnauthorizedAccessException("You don't have permissions to access this resource.");
+            return Unauthorized("You don't have permissions to access this resource.");
         }
 
         // Depending on the permissions, return the forecast for 1 or 5 days
         var forecastDays = canGetFutureForecast ? 5 : 1;
 
         // Generate the forecast
-        return Enumerable.Range(1, forecastDays).Select(index => new WeatherForecast
+        var forecast = Enumerable.Range(1, forecastDays).Select(index => new WeatherForecast
         {
             Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
             TemperatureC = Random.Shared.Next(-20, 55),
-            Summary = Summaries[Random.Shared.Next(Summaries.Length)],
-            City = city
+            Summary = Summaries[Random.Shared.Next(Summaries.Length)]
         })
         .ToArray();
+
+        return Ok(forecast);
     }
 }
