@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SpaceBlocks.Permissions.Server" Version="0.24.9" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="SpaceBlocks.Permissions.Server" Version="2.1.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />    
   </ItemGroup>
 
 </Project>
