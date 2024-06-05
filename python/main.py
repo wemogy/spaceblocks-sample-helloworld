@@ -12,21 +12,15 @@ permissions_client = PermissionsClient(
     )
 )
 
-permissions_client.tenant_api.patch_tenant_members(
-    'default',
-    ResourceMembers(subjects={
-        'alice': ['internal'],
-        'linda': ['tax-accountant']
-    })
-)
 
-
-@app.get('/GetWeatherForecast/')
+@app.get('/get-weather-forecast/')
 def get_weather_forecast(user: str, city: str):
-    has_permission: bool = permissions_client.tenant_api.check_tenant_permissions(
+    has_permission: bool = permissions_client.permission_api.check_permissions(
         'default',
-        user,
+        'city',
         city,
+        user,
+        'city',
         ['get-current-forecast']
     )
 
