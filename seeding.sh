@@ -1,7 +1,16 @@
-read -p "Permissions URL: " PERMISSIONS_URL
-read -p "API Key: " API_KEY
-read -p "Client ID: " CLIENT_ID
-read -p "Client Secret: " CLIENT_SECRET
+#! /bin/bash
+
+if [ $1 = "--secrets-from-file" ]; then
+  PERMISSIONS_URL=$(jq -r '.permissionsUrl' secrets.json)
+  API_KEY=$(jq -r '.apiKey' secrets.json)
+  CLIENT_ID=$(jq -r '.clientId' secrets.json)
+  CLIENT_SECRET=$(jq -r '.clientSecret' secrets.json)
+else
+  read -p "Permissions URL: " PERMISSIONS_URL
+  read -p "API Key: " API_KEY
+  read -p "Client ID: " CLIENT_ID
+  read -p "Client Secret: " CLIENT_SECRET
+fi
 
 ACCESS_TOKEN=$(curl --no-progress-meter -f --location "https://auth.spaceblocks.cloud/token-manager/token" \
   --request POST \
