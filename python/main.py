@@ -27,8 +27,6 @@ def get_weather_forecast(user: str, city: str):
         user
     )
 
-    print(permissions)
-
     can_get_current_forecast = 'current-forecast-viewer' in permissions['city']
     can_get_future_forecast = 'future-forecast-viewer' in permissions['city']
 
