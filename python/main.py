@@ -1,5 +1,10 @@
-from fastapi import FastAPI
+from datetime import date, timedelta
+from random import randint, choice
+
+from fastapi import FastAPI, HTTPException
 from spaceblocks_permissions_server import PermissionsClient, ClientAuthenticationOptions, ResourceMembers
+
+SUMMARIES = ['Freezing', 'Bracing', 'Chilly', 'Cool', 'Mild', 'Warm', 'Balmy', 'Hot', 'Sweltering', 'Scorching']
 
 app = FastAPI()
 
@@ -15,16 +20,23 @@ permissions_client = PermissionsClient(
 
 @app.get('/get-weather-forecast/')
 def get_weather_forecast(user: str, city: str):
-    has_permission: bool = permissions_client.permission_api.check_permissions(
+    permissions = permissions_client.permission_api.list_permissions(
         'default',
         'city',
         city,
-        user,
-        'city',
-        ['get-current-forecast']
+        user
     )
 
-    if not has_permission:
-        return 'No permission'
+    print(permissions)
 
-    return 'Hello World!'
+    can_get_current_forecast = 'current-forecast-viewer' in permissions['city']
+    can_get_future_forecast = 'future-forecast-viewer' in permissions['city']
+
+    if not can_get_current_forecast and not can_get_future_forecast:
+        raise HTTPException(status_code=401, detail='No permission')
+
+    return [{
+                'date': date.today() + timedelta(days=i+1),
+                'temperature': randint(-5, 38),
+                'summary': choice(SUMMARIES) 
+            } for i in range(5 if can_get_future_forecast else 1)]
