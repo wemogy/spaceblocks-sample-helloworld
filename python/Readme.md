@@ -3,11 +3,13 @@
 ## Install dependencies
 
 ```bash
-poetry install
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
 ## Run the app
 
 ```bash
-poetry run fastapi dev main.py
+fastapi dev main.py
 ```
