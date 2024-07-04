@@ -1,2 +1,2 @@
 fastapi==0.111.0
-spaceblocks-permissions-server==2.8.0
+spaceblocks-permissions-server==2.9.2
