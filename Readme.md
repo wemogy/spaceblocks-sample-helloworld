@@ -1,11 +1,11 @@
-# Space Blocks Sample HelloWorld
+# Space Blocks Hello World Sample  
 
 ## Setup
 
-The permissions structure is desribed in the blog [Quickly add permission checks to your ASP.NET apps
+The permissions structure is described in the blog [Quickly add permission checks to your ASP.NET apps
 ](https://www.spaceblocks.cloud/blog/quickly-add-permission-checks-to-your-asp-net-apps).
 
-Alternativly, the `setup.sh` script creates these structures via the API.
+Alternatively, the `setup.sh` script creates these structures via the API.
 
 There is also a `seeding.sh` script that puts some demo data into Permissions.
 
@@ -22,4 +22,5 @@ To avoid having to enter them again and again, create a `secrets.json` that look
     "clientSecret": ""
 }
 ```
+
 Then run the scripts with the `--secrets-from-file` flag.
